@@ -1,0 +1,3 @@
+###
+# Product Composite Service
+GET http://localhost:8080/product-composite/123
