@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class ProductCompositeServiceImpl implements ProductCompositeService {
@@ -56,18 +55,18 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
         List<RecommendationSummary> recommendationSummaries =
                 (recommendations == null) ? null : recommendations.stream()
                         .map(r -> new RecommendationSummary(r.recommendationId(), r.author(), r.rate()))
-                        .collect(Collectors.toList());
+                        .toList();
 
         // 3. Copy summary review info, if available
         List<ReviewSummary> reviewSummaries =
                 (reviews == null) ? null : reviews.stream()
                         .map(r -> new ReviewSummary(r.reviewId(), r.author(), r.subject()))
-                        .collect(Collectors.toList());
+                        .toList();
 
         // 4. Create info regarding the involved microservices addresses
         String productAddress = product.serviceAddress();
-        String reviewAddress = (reviews != null && reviews.size() > 0) ? reviews.get(0).serviceAddress() : "";
-        String recommendationAddress = (recommendations != null && recommendations.size() > 0) ? recommendations.get(0).serviceAddress() : "";
+        String reviewAddress = (reviews != null && !reviews.isEmpty()) ? reviews.get(0).serviceAddress() : "";
+        String recommendationAddress = (recommendations != null && !recommendations.isEmpty()) ? recommendations.get(0).serviceAddress() : "";
         ServiceAddresses serviceAddresses = new ServiceAddresses(serviceAddress, productAddress, reviewAddress, recommendationAddress);
 
         return new ProductAggregate(productId, name, weight, recommendationSummaries, reviewSummaries, serviceAddresses);
