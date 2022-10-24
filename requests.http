@@ -1,0 +1,53 @@
+###
+# Product Composite Service
+GET http://localhost:7000/product-composite/123
+
+###
+# Product Composite Service - invalid input
+GET http://localhost:7000/product-composite/0
+
+###
+# Product Composite Service - not found
+GET http://localhost:7000/product-composite/13
+
+
+
+###
+# Product Service - get product
+GET http://localhost:7001/product/123
+
+###
+# Product Service - get product - invalid input
+GET http://localhost:7001/product/0
+
+###
+# Product Service - get product - not found
+GET http://localhost:7001/product/13
+
+
+
+###
+# Recommendation Service - get recommendations
+GET http://localhost:7002/recommendation?productId=123
+
+###
+# Recommendation Service - get recommendations - invalid input
+GET http://localhost:7002/recommendation?productId=0
+
+###
+# Recommendation Service - get recommendations - not found
+GET http://localhost:7002/recommendation?productId=113
+
+
+
+###
+# Review Summary - get reviews
+GET http://localhost:7003/review?productId=123
+
+###
+# Review Summary - get reviews - invalid input
+GET http://localhost:7003/review?productId=0
+
+###
+# Review Summary - get reviews - not found
+GET http://localhost:7003/review?productId=213
