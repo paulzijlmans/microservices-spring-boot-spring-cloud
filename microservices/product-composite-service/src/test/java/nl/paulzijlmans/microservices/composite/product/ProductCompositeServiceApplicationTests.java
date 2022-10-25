@@ -1,23 +1,28 @@
 package nl.paulzijlmans.microservices.composite.product;
 
+import static java.util.Collections.singletonList;
+import static org.mockito.Mockito.when;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static reactor.core.publisher.Mono.just;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import nl.paulzijlmans.api.composite.product.ProductAggregate;
+import nl.paulzijlmans.api.composite.product.RecommendationSummary;
+import nl.paulzijlmans.api.composite.product.ReviewSummary;
 import nl.paulzijlmans.api.core.product.Product;
 import nl.paulzijlmans.api.core.recommendation.Recommendation;
 import nl.paulzijlmans.api.core.review.Review;
 import nl.paulzijlmans.api.exceptions.InvalidInputException;
 import nl.paulzijlmans.api.exceptions.NotFoundException;
 import nl.paulzijlmans.microservices.composite.product.services.ProductCompositeIntegration;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.reactive.server.WebTestClient;
-
-import static java.util.Collections.singletonList;
-import static org.mockito.Mockito.when;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class ProductCompositeServiceApplicationTests {
@@ -26,11 +31,9 @@ class ProductCompositeServiceApplicationTests {
 	private static final int PRODUCT_ID_NOT_FOUND = 2;
 	private static final int PRODUCT_ID_INVALID = 3;
 
-	@Autowired
-	private WebTestClient client;
+	@Autowired private WebTestClient client;
 
-	@MockBean
-	private ProductCompositeIntegration compositeIntegration;
+	@MockBean private ProductCompositeIntegration compositeIntegration;
 
 	@BeforeEach
 	void setUp() {
@@ -53,15 +56,36 @@ class ProductCompositeServiceApplicationTests {
 	void contextLoads() {}
 
 	@Test
-	void getProductById() {
+	void createCompositeProduct1() {
+		ProductAggregate compositeProduct = new ProductAggregate(1, "name", 1, null, null, null);
 
-		client.get()
-				.uri("/product-composite/" + PRODUCT_ID_OK)
-				.accept(APPLICATION_JSON)
-				.exchange()
-				.expectStatus().isOk()
-				.expectHeader().contentType(APPLICATION_JSON)
-				.expectBody()
+		postAndVerifyProduct(compositeProduct, OK);
+	}
+
+	@Test
+	void createCompositeProduct2() {
+		ProductAggregate compositeProduct = new ProductAggregate(1, "name", 1,
+				singletonList(new RecommendationSummary(1, "a", 1, "c")),
+				singletonList(new ReviewSummary(1, "a", "s", "c")), null);
+
+		postAndVerifyProduct(compositeProduct, OK);
+	}
+
+	@Test
+	void deleteCompositeProduct() {
+		ProductAggregate compositeProduct = new ProductAggregate(1, "name", 1,
+				singletonList(new RecommendationSummary(1, "a", 1, "c")),
+				singletonList(new ReviewSummary(1, "a", "s", "c")), null);
+
+		postAndVerifyProduct(compositeProduct, OK);
+
+		deleteAndVerifyProduct(compositeProduct.productId(), OK);
+		deleteAndVerifyProduct(compositeProduct.productId(), OK);
+	}
+
+	@Test
+	void getProductById() {
+		getAndVerifyProduct(PRODUCT_ID_OK, OK)
 				.jsonPath("$.productId").isEqualTo(PRODUCT_ID_OK)
 				.jsonPath("$.recommendations.length()").isEqualTo(1)
 				.jsonPath("$.reviews.length()").isEqualTo(1);
@@ -69,29 +93,40 @@ class ProductCompositeServiceApplicationTests {
 
 	@Test
 	void getProductNotFound() {
-
-		client.get()
-				.uri("/product-composite/" + PRODUCT_ID_NOT_FOUND)
-				.accept(APPLICATION_JSON)
-				.exchange()
-				.expectStatus().isNotFound()
-				.expectHeader().contentType(APPLICATION_JSON)
-				.expectBody()
+		getAndVerifyProduct(PRODUCT_ID_NOT_FOUND, NOT_FOUND)
 				.jsonPath("$.path").isEqualTo("/product-composite/" + PRODUCT_ID_NOT_FOUND)
 				.jsonPath("$.message").isEqualTo("NOT FOUND: " + PRODUCT_ID_NOT_FOUND);
 	}
 
 	@Test
 	void getProductInvalidInput() {
-
-		client.get()
-				.uri("/product-composite/" + PRODUCT_ID_INVALID)
-				.accept(APPLICATION_JSON)
-				.exchange()
-				.expectStatus().isEqualTo(UNPROCESSABLE_ENTITY)
-				.expectHeader().contentType(APPLICATION_JSON)
-				.expectBody()
+		getAndVerifyProduct(PRODUCT_ID_INVALID, UNPROCESSABLE_ENTITY)
 				.jsonPath("$.path").isEqualTo("/product-composite/" + PRODUCT_ID_INVALID)
 				.jsonPath("$.message").isEqualTo("INVALID: " + PRODUCT_ID_INVALID);
+	}
+
+	private WebTestClient.BodyContentSpec getAndVerifyProduct(int productId, HttpStatus expectedStatus) {
+		return client.get()
+				.uri("/product-composite/" + productId)
+				.accept(APPLICATION_JSON)
+				.exchange()
+				.expectStatus().isEqualTo(expectedStatus)
+				.expectHeader().contentType(APPLICATION_JSON)
+				.expectBody();
+	}
+
+	private void postAndVerifyProduct(ProductAggregate compositeProduct, HttpStatus expectedStatus) {
+		client.post()
+				.uri("/product-composite")
+				.body(just(compositeProduct), ProductAggregate.class)
+				.exchange()
+				.expectStatus().isEqualTo(expectedStatus);
+	}
+
+	private void deleteAndVerifyProduct(int productId, HttpStatus expectedStatus) {
+		client.delete()
+				.uri("/product-composite/" + productId)
+				.exchange()
+				.expectStatus().isEqualTo(expectedStatus);
 	}
 }

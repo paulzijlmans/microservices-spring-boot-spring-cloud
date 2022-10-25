@@ -6,7 +6,7 @@ plugins {
 
 group = 'nl.paulzijlmans.microservices.composite.product'
 version = '1.0.0-SNAPSHOT'
-sourceCompatibility = '17'
+sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
 	mavenCentral()
