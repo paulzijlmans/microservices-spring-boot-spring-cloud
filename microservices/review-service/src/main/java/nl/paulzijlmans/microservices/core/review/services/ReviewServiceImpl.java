@@ -1,10 +1,11 @@
 package nl.paulzijlmans.microservices.core.review.services;
 
-import static java.util.logging.Level.FINE;
-
-import java.util.List;
-
-import nl.paulzijlmans.api.core.recommendation.Recommendation;
+import nl.paulzijlmans.api.core.review.Review;
+import nl.paulzijlmans.api.core.review.ReviewService;
+import nl.paulzijlmans.api.exceptions.InvalidInputException;
+import nl.paulzijlmans.microservices.core.review.persistence.ReviewEntity;
+import nl.paulzijlmans.microservices.core.review.persistence.ReviewRepository;
+import nl.paulzijlmans.util.http.ServiceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
-import nl.paulzijlmans.api.core.review.Review;
-import nl.paulzijlmans.api.core.review.ReviewService;
-import nl.paulzijlmans.api.exceptions.InvalidInputException;
-import nl.paulzijlmans.microservices.core.review.persistence.ReviewEntity;
-import nl.paulzijlmans.microservices.core.review.persistence.ReviewRepository;
-import nl.paulzijlmans.util.http.ServiceUtil;
+
+import java.util.List;
+
+import static java.util.logging.Level.FINE;
 
 @RestController
 public class ReviewServiceImpl implements ReviewService {
@@ -44,7 +43,6 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Mono<Review> createReview(Review body) {
-
         if (body.productId() < 1) {
             throw new InvalidInputException("Invalid productId: " + body.productId());
         }
@@ -67,7 +65,6 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Flux<Review> getReviews(int productId) {
-
         if (productId < 1) {
             throw new InvalidInputException("Invalid productId: " + productId);
         }

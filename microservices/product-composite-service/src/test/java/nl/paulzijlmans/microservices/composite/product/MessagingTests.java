@@ -13,6 +13,7 @@ import static nl.paulzijlmans.microservices.composite.product.IsSameEvent.sameEv
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -34,8 +35,9 @@ import nl.paulzijlmans.api.core.review.Review;
 import nl.paulzijlmans.api.event.Event;
 
 @SpringBootTest(
-        webEnvironment = RANDOM_PORT,
-        properties = {"spring.main.allow-bean-definition-overriding=true"})
+        webEnvironment = RANDOM_PORT, properties = {
+        "spring.main.allow-bean-definition-overriding=true",
+        "eureka.client.enabled=false"})
 @Import({TestChannelBinderConfiguration.class})
 class MessagingTests {
 
