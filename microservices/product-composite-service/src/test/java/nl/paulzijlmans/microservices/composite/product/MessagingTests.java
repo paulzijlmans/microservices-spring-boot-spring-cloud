@@ -35,9 +35,12 @@ import nl.paulzijlmans.api.core.review.Review;
 import nl.paulzijlmans.api.event.Event;
 
 @SpringBootTest(
-        webEnvironment = RANDOM_PORT, properties = {
-        "spring.main.allow-bean-definition-overriding=true",
-        "eureka.client.enabled=false"})
+        webEnvironment = RANDOM_PORT,
+        classes = {TestSecurityConfig.class},
+        properties = {
+                "spring.security.oauth2.resourceserver.jwt.issuer-uri=",
+                "spring.main.allow-bean-definition-overriding=true",
+                "eureka.client.enabled=false"})
 @Import({TestChannelBinderConfiguration.class})
 class MessagingTests {
 
