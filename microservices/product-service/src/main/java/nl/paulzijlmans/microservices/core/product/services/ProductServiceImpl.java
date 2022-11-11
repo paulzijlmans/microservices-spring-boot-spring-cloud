@@ -1,4 +1,4 @@
-package nl.paulzijlmans.microservices.core.product.service;
+package nl.paulzijlmans.microservices.core.product.services;
 
 import nl.paulzijlmans.api.core.product.Product;
 import nl.paulzijlmans.api.core.product.ProductService;
