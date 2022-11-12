@@ -1,6 +1,6 @@
 plugins {
 	id 'org.springframework.boot' version '2.7.5'
-	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 	id 'java'
 }
 
@@ -10,7 +10,7 @@ sourceCompatibility = JavaVersion.VERSION_17
 
 ext {
 	mapstructVersion = "1.5.3.Final"
-	springCloudVersion = "2021.0.4"
+	springCloudVersion = "2021.0.5"
 }
 
 repositories {
@@ -31,8 +31,13 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+	implementation 'org.springframework.cloud:spring-cloud-sleuth-zipkin'
 	implementation 'org.springframework.retry:spring-retry'
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+
+	// See https://github.com/netty/netty/issues/11693
+	implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', classifier: 'osx-aarch_64'
 
 	compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
@@ -41,12 +46,10 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 
-	implementation platform('org.testcontainers:testcontainers-bom:1.15.2')
+	implementation platform('org.testcontainers:testcontainers-bom:1.16.2')
 	testImplementation 'org.testcontainers:testcontainers'
 	testImplementation 'org.testcontainers:junit-jupiter'
 	testImplementation 'org.testcontainers:mongodb'
-	// To run testcontainers on M1
-	testImplementation 'net.java.dev.jna:jna-platform:5.8.0'
 }
 
 dependencyManagement {
