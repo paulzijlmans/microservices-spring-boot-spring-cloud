@@ -20,9 +20,7 @@ import nl.paulzijlmans.api.event.Event;
 import nl.paulzijlmans.api.exceptions.InvalidInputException;
 import nl.paulzijlmans.microservices.core.product.persistence.ProductRepository;
 
-@SpringBootTest(webEnvironment = RANDOM_PORT, properties = {
-		"eureka.client.enabled=false",
-		"spring.cloud.config.enabled=false"})
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 class ProductServiceApplicationTests extends MongoDbTestBase {
 
 	@Autowired

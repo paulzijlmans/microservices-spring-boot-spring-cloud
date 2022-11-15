@@ -2,6 +2,3 @@
 
 ## OpenAPI documentation
 http://localhost:8080/openapi/swagger-ui.html
-
-## Eureka
-http://localhost:8080/eureka/web
